@@ -24,11 +24,14 @@ class DefaultButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 60,
+      height: 80,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: style.backgroundColor,
           foregroundColor: style.foregroundColor,
+          shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.circular(32),
+          ),
         ),
         onPressed: onPressed,
         child: child,

@@ -39,14 +39,16 @@ class Bottle extends StatelessWidget {
         ),
         if (showLimit)
           const Positioned.fill(
+            top: null,
+            bottom: 12,
             child: Center(
               child: SizedBox(
                 child: Text(
                   '2 Litros',
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 30,
-                    color: Colors.lightBlue,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 18,
+                    color: Colors.grey,
                   ),
                 ),
               ),

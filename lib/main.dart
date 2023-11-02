@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:drink_watter/bottle.dart';
 import 'package:drink_watter/day_drink.dart';
+import 'package:drink_watter/day_drink_chart.dart';
 import 'package:drink_watter/default_button.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -16,11 +19,15 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      scrollBehavior: const MaterialScrollBehavior().copyWith(dragDevices: {
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.touch,
+        PointerDeviceKind.trackpad,
+      }),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -50,10 +57,13 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final dateFormat = DateFormat('dd/MM/yyyy');
-  late final Box<DayDrink> box;
+  Box<DayDrink>? box;
 
   initiateBox() async {
-    box = await Hive.openBox<DayDrink>('dayDrinkBox');
+    final initialize = await Hive.openBox<DayDrink>('dayDrinkBox');
+    setState(() {
+      box = initialize;
+    });
   }
 
   double goal = 2000;
@@ -63,8 +73,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    initiateBox();
     super.initState();
+    initiateBox();
   }
 
   void _incrementCounter() {
@@ -73,9 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
       currentMls = _counter * 100;
     });
 
-    final currentDate = dateFormat.format(DateTime.now());
-
-    box.put(currentDate, DayDrink(currentDate, currentMls));
+    final currentDate = dateFormat.format(DateTime(2023, 11, 01));
+    box?.put(currentDate, DayDrink(currentDate, currentMls));
   }
 
   void _decrementCounter() {
@@ -84,74 +93,110 @@ class _MyHomePageState extends State<MyHomePage> {
       _counter--;
       currentMls = _counter * 100;
     });
+    box?.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     extraBottles = currentMls ~/ 2000;
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              height: extraBottles > 0 ? 80 : 0,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.only(bottom: 24),
-                itemCount: extraBottles,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (_, __) {
-                  return const Bottle(drinkedMls: 2000, showLimit: false);
-                },
-              ),
-            ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Column(
+      body: SafeArea(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
                   children: [
-                    Bottle(
-                      drinkedMls: currentMls - (currentMls ~/ 2000 * goal),
+                    const Text('Garrafas Bebidas'),
+                    const SizedBox(height: 8),
+                    Container(
+                      color: Colors.grey[200],
+                      height: 80,
+                      child: Center(
+                        child: ListView.separated(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.all(8),
+                          scrollDirection: Axis.horizontal,
+                          itemCount: extraBottles,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(width: 12),
+                          itemBuilder: (_, __) {
+                            return const Bottle(
+                              drinkedMls: 2000,
+                              showLimit: false,
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(width: 24),
-                Column(
+              ),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    DefaultButton(
-                      onPressed: _incrementCounter,
-                      child: const Icon(Icons.add),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.4,
+                      child: Bottle(
+                        drinkedMls: currentMls - (currentMls ~/ 2000 * goal),
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(width: 24),
                     Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          '${currentMls / 1000}',
-                          style: const TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        DefaultButton(
+                          onPressed: _incrementCounter,
+                          child: const Icon(Icons.add),
                         ),
-                        const Text(
-                          'Litros',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        const SizedBox(height: 16),
+                        Column(
+                          children: [
+                            Text(
+                              '${currentMls / 1000}',
+                              style: const TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const Text(
+                              'Litros',
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        DefaultButton(
+                          onPressed: _decrementCounter,
+                          style: DefaultButtonStyle.secondary,
+                          child: const Icon(Icons.remove),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 16),
-                    DefaultButton(
-                      onPressed: _decrementCounter,
-                      style: DefaultButtonStyle.secondary,
-                      child: const Icon(Icons.remove),
-                    ),
+                    )
                   ],
-                )
-              ],
-            ),
-          ],
+                ),
+              ),
+              ((box?.length ?? 0) > 0)
+                  ? SizedBox(
+                      height: 200,
+                      child: DayDrinkChart(box?.values.toList() ?? []))
+                  : Container(
+                      width: double.maxFinite,
+                      height: 200,
+                      color: Colors.grey[200],
+                      child: const Center(
+                        child: Text('Sem dados Salvos até o momento'),
+                      ),
+                    ),
+            ],
+          ),
         ),
       ),
     );
