@@ -10,7 +10,7 @@ class Bottle extends StatelessWidget {
     super.key,
   });
 
-  final bottleLimit = 2000;
+  final bottleLimit = 2;
 
   @override
   Widget build(BuildContext context) {

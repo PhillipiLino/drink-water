@@ -11,6 +11,7 @@ class DayDrinkChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       scrollDirection: Axis.horizontal,
       child: SizedBox(
         width: 1.5 * 25 * list.length,
@@ -22,7 +23,7 @@ class DayDrinkChart extends StatelessWidget {
             barGroups: barGroups,
             gridData: const FlGridData(show: false),
             alignment: BarChartAlignment.spaceBetween,
-            maxY: list.map((e) => e.drinkedMls / 1000).reduce(max) + 1.8,
+            maxY: list.map((e) => e.drinkedMls).reduce(max) + 1.8,
           ),
         ),
       ),
@@ -42,7 +43,7 @@ class DayDrinkChart extends StatelessWidget {
             int rodIndex,
           ) {
             return BarTooltipItem(
-              rod.toY.toString(),
+              '${rod.toY.toStringAsFixed(1)} L',
               const TextStyle(
                 color: Colors.cyan,
                 fontWeight: FontWeight.bold,
@@ -88,18 +89,31 @@ class DayDrinkChart extends StatelessWidget {
         ),
       );
 
-  FlBorderData get borderData => FlBorderData(
-        show: false,
-      );
+  FlBorderData get borderData => FlBorderData(show: false);
 
-  LinearGradient get _barsGradient => const LinearGradient(
-        colors: [
-          Colors.blue,
-          Colors.cyan,
-        ],
-        begin: Alignment.bottomCenter,
-        end: Alignment.topCenter,
-      );
+  LinearGradient _barsGradient(double value) {
+    Color topColor = Colors.cyan;
+    Color bottomColor = Colors.blue;
+
+    if (value <= 1) {
+      topColor = const Color.fromARGB(255, 255, 175, 187);
+      bottomColor = Colors.red;
+    }
+
+    if (value > 1 && value < 2) {
+      topColor = const Color.fromARGB(255, 253, 220, 119);
+      bottomColor = Colors.amber;
+    }
+
+    return LinearGradient(
+      colors: [
+        bottomColor,
+        topColor,
+      ],
+      begin: Alignment.bottomCenter,
+      end: Alignment.topCenter,
+    );
+  }
 
   List<BarChartGroupData> get barGroups => list
       .asMap()
@@ -110,8 +124,8 @@ class DayDrinkChart extends StatelessWidget {
             x: key,
             barRods: [
               BarChartRodData(
-                toY: value.drinkedMls / 1000.0,
-                gradient: _barsGradient,
+                toY: value.drinkedMls,
+                gradient: _barsGradient(value.drinkedMls),
                 width: 10,
               )
             ],
