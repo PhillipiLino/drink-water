@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:drink_watter/day_drink.dart';
+import 'package:drink_watter/number_extensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -51,7 +52,7 @@ class DayDrinkChart extends StatelessWidget {
             }
 
             return BarTooltipItem(
-              '${rod.toY.toStringAsFixed(1)} L',
+              '${rod.toY.toLocale()} L',
               TextStyle(
                 color: textColor,
                 fontWeight: FontWeight.bold,

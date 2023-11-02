@@ -1,3 +1,5 @@
+import 'package:drink_watter/number_extensions.dart';
+import 'package:drink_watter/water_calculator_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
@@ -17,7 +19,8 @@ class DrinkPage extends StatefulWidget {
 class _DrinkPageState extends State<DrinkPage> {
   final dateFormat = DateFormat('dd/MM/yyyy');
   Box<DayDrink>? box;
-  final valueByTap = 0.1;
+  final valueByTap = 0.05;
+  double requiredDrink = 0;
 
   initiateBox() async {
     final initialize = await Hive.openBox<DayDrink>('dayDrinkBox');
@@ -41,7 +44,7 @@ class _DrinkPageState extends State<DrinkPage> {
 
   _incrementCounter() {
     setState(() {
-      currentMls >= 6.0 ? currentMls = 6 : currentMls += valueByTap;
+      currentMls >= 6 ? currentMls = 6 : currentMls += valueByTap;
     });
 
     final currentDate = dateFormat.format(DateTime.now());
@@ -50,7 +53,7 @@ class _DrinkPageState extends State<DrinkPage> {
 
   _decrementCounter() {
     setState(() {
-      currentMls <= 0.0 ? currentMls = 0 : currentMls -= valueByTap;
+      currentMls <= 0 ? currentMls = 0 : currentMls -= valueByTap;
     });
 
     final currentDate = dateFormat.format(DateTime.now());
@@ -104,7 +107,7 @@ class _DrinkPageState extends State<DrinkPage> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w200,
-                                  fontSize: 20,
+                                  fontSize: 16,
                                 ),
                               ),
                             ),
@@ -115,6 +118,22 @@ class _DrinkPageState extends State<DrinkPage> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 32.0),
                 child: Divider(),
+              ),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  text: 'Seu consumo de água necessário é de:\n',
+                  style: const TextStyle(color: Colors.black),
+                  children: [
+                    TextSpan(
+                      text: '${requiredDrink.toLocale()}L',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const TextSpan(text: ' por dia'),
+                  ],
+                ),
               ),
               Expanded(
                 flex: 2,
@@ -141,7 +160,7 @@ class _DrinkPageState extends State<DrinkPage> {
                         Column(
                           children: [
                             Text(
-                              currentMls.toStringAsFixed(1),
+                              currentMls.toLocale(),
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -210,6 +229,32 @@ class _DrinkPageState extends State<DrinkPage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.blue[100],
+        foregroundColor: Colors.blue,
+        mini: true,
+        child: const Icon(Icons.question_mark_rounded),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    WaterCalculatorPage((value) {
+                      setState(() => requiredDrink = value);
+                    }),
+                  ],
+                ),
+              );
+            },
+          );
+        },
       ),
     );
   }
