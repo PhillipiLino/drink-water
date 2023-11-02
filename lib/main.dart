@@ -1,8 +1,15 @@
 import 'package:drink_watter/bottle.dart';
+import 'package:drink_watter/day_drink.dart';
 import 'package:drink_watter/default_button.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:intl/intl.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(DayDrinkAdapter());
+
   runApp(const MyApp());
 }
 
@@ -15,21 +22,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
@@ -57,16 +49,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final dateFormat = DateFormat('dd/MM/yyyy');
+  late final Box<DayDrink> box;
+
+  initiateBox() async {
+    box = await Hive.openBox<DayDrink>('dayDrinkBox');
+  }
+
   double goal = 2000;
   double currentMls = 0;
   int extraBottles = 0;
   int _counter = 0;
+
+  @override
+  void initState() {
+    initiateBox();
+    super.initState();
+  }
 
   void _incrementCounter() {
     setState(() {
       _counter++;
       currentMls = _counter * 100;
     });
+
+    final currentDate = dateFormat.format(DateTime.now());
+
+    box.put(currentDate, DayDrink(currentDate, currentMls));
   }
 
   void _decrementCounter() {
