@@ -42,10 +42,18 @@ class DayDrinkChart extends StatelessWidget {
             BarChartRodData rod,
             int rodIndex,
           ) {
+            Color textColor = Colors.blue;
+
+            if (rod.toY <= 1) textColor = Colors.red;
+
+            if (rod.toY > 1 && rod.toY < 2) {
+              textColor = const Color.fromARGB(255, 222, 168, 4);
+            }
+
             return BarTooltipItem(
               '${rod.toY.toStringAsFixed(1)} L',
-              const TextStyle(
-                color: Colors.cyan,
+              TextStyle(
+                color: textColor,
                 fontWeight: FontWeight.bold,
               ),
             );
@@ -55,8 +63,8 @@ class DayDrinkChart extends StatelessWidget {
 
   Widget getTitles(double value, TitleMeta meta) {
     const style = TextStyle(
-      color: Colors.blue,
-      fontWeight: FontWeight.bold,
+      color: Colors.black,
+      fontWeight: FontWeight.w300,
       fontSize: 14,
     );
     String text;

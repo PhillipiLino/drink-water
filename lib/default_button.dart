@@ -51,16 +51,18 @@ class _DefaultButtonState extends State<DefaultButton> {
             ),
           ),
         ),
-        height: 80,
-        width: 70,
-        child: Material(
-          color: widget.style.backgroundColor,
-          child: InkWell(
-            onTapDown: (_) => timerAction(widget.onPressed),
-            onTapUp: (_) => _timer.cancel(),
-            onTapCancel: _timer.cancel,
-            onTap: widget.onPressed,
-            child: widget.child,
+        height: MediaQuery.of(context).size.height * 0.08,
+        child: AspectRatio(
+          aspectRatio: 0.9,
+          child: Material(
+            color: widget.style.backgroundColor,
+            child: InkWell(
+              onTapDown: (_) => timerAction(widget.onPressed),
+              onTapUp: (_) => _timer.cancel(),
+              onTapCancel: _timer.cancel,
+              onTap: widget.onPressed,
+              child: widget.child,
+            ),
           ),
         ),
       ),

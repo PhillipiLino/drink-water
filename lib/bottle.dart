@@ -16,9 +16,6 @@ class Bottle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Image.asset(
-          'assets/images/bottle.png',
-        ),
         ShaderMask(
           shaderCallback: (bounds) {
             return LinearGradient(
@@ -35,25 +32,9 @@ class Bottle extends StatelessWidget {
               tileMode: TileMode.mirror,
             ).createShader(bounds);
           },
-          child: Image.asset('assets/images/bottle.png'),
+          child: Image.asset('assets/images/bottle_mask.png'),
         ),
-        if (showLimit)
-          const Positioned.fill(
-            top: null,
-            bottom: 12,
-            child: Center(
-              child: SizedBox(
-                child: Text(
-                  '2 Litros',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-          ),
+        Image.asset('assets/images/bottle_overlay.png'),
       ],
     );
   }
