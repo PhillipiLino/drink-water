@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:drink_watter/day_drink.dart';
-import 'package:drink_watter/number_extensions.dart';
+import 'package:drink_water/day_drink.dart';
+import 'package:drink_water/number_extensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 

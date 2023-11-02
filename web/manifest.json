@@ -1,6 +1,6 @@
 {
-    "name": "drink_watter",
-    "short_name": "drink_watter",
+    "name": "drink_water",
+    "short_name": "drink_water",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

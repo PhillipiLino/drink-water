@@ -1,5 +1,5 @@
-import 'package:drink_watter/number_extensions.dart';
-import 'package:drink_watter/water_calculator_page.dart';
+import 'package:drink_water/number_extensions.dart';
+import 'package:drink_water/water_calculator_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';

@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:drink_watter/day_drink.dart';
+import 'package:drink_water/day_drink.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 

@@ -1,5 +1,5 @@
-import 'package:drink_watter/number_extensions.dart';
-import 'package:drink_watter/string_extensions.dart';
+import 'package:drink_water/number_extensions.dart';
+import 'package:drink_water/string_extensions.dart';
 import 'package:flutter/services.dart';
 
 class WeightInputFormatter extends TextInputFormatter {

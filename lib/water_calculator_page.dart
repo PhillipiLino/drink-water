@@ -1,4 +1,4 @@
-import 'package:drink_watter/number_extensions.dart';
+import 'package:drink_water/number_extensions.dart';
 import 'package:flutter/material.dart';
 
 class WaterCalculatorPage extends StatefulWidget {
