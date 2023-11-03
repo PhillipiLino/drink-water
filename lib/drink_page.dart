@@ -174,12 +174,15 @@ class _DrinkPageState extends State<DrinkPage> {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: 'Seu consumo de água necessário é de:\n',
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300,
+                  ),
                   children: [
                     TextSpan(
                       text: '${requiredDrink.toLocale()}L',
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                     const TextSpan(text: ' por dia'),
@@ -280,9 +283,27 @@ class _DrinkPageState extends State<DrinkPage> {
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Você precisa beber ${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas dessa para atingir seu consumo mínimo diário de água!',
+                child: RichText(
                   textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: 'Você precisa beber ',
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w300,
+                    ),
+                    children: [
+                      TextSpan(
+                        text:
+                            '${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const TextSpan(
+                          text:
+                              ' dessa para atingir seu consumo mínimo diário de água!'),
+                    ],
+                  ),
                 ),
               ),
               Align(
