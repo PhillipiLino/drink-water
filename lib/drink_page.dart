@@ -255,7 +255,7 @@ class _DrinkPageState extends State<DrinkPage> {
         backgroundColor: Colors.blue[100],
         foregroundColor: Colors.blue,
         mini: true,
-        child: const Icon(Icons.question_mark_rounded),
+        child: const Icon(Icons.calculate_rounded),
         onPressed: () {
           showDialog(
             context: context,
