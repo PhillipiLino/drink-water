@@ -67,6 +67,9 @@ flutter:
     - assets/images/bottle.png
     - assets/images/bottle_mask.png
     - assets/images/bottle_overlay.png
+    - assets/images/copo-americano.png
+    - assets/images/copo-medio.png
+    - assets/images/copo-grande.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

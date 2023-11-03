@@ -28,12 +28,17 @@ class DefaultButton extends StatefulWidget {
 }
 
 class _DefaultButtonState extends State<DefaultButton> {
-  Timer _timer = Timer(const Duration(milliseconds: 0), () {});
+  Timer? _timer;
 
   timerAction(VoidCallback action) {
     _timer = Timer.periodic(const Duration(milliseconds: 100), (t) {
       action();
     });
+  }
+
+  cancelTimer() {
+    _timer?.cancel();
+    _timer = null;
   }
 
   @override
@@ -58,8 +63,8 @@ class _DefaultButtonState extends State<DefaultButton> {
             color: widget.style.backgroundColor,
             child: InkWell(
               onTapDown: (_) => timerAction(widget.onPressed),
-              onTapUp: (_) => _timer.cancel(),
-              onTapCancel: _timer.cancel,
+              onTapUp: (_) => cancelTimer(),
+              onTapCancel: cancelTimer,
               onTap: widget.onPressed,
               child: widget.child,
             ),

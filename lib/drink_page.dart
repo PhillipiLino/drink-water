@@ -1,3 +1,4 @@
+import 'package:drink_water/glass_button.dart';
 import 'package:drink_water/number_extensions.dart';
 import 'package:drink_water/water_calculator_page.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ class _DrinkPageState extends State<DrinkPage> {
   final requiredDrinkKey = 'required_drink';
 
   Box<DayDrink>? box;
-  final valueByTap = 0.05;
+  static const valueByTap = 0.05;
   double requiredDrink = 0;
 
   initiateBox() async {
@@ -49,9 +50,9 @@ class _DrinkPageState extends State<DrinkPage> {
     initiateBox();
   }
 
-  _incrementCounter() {
+  _incrementCounter([double value = valueByTap]) {
     setState(() {
-      currentMls >= 6 ? currentMls = 6 : currentMls += valueByTap;
+      currentMls + value >= 6 ? currentMls = 6 : currentMls += value;
     });
 
     final currentDate = dateFormat.format(DateTime.now());
@@ -60,7 +61,7 @@ class _DrinkPageState extends State<DrinkPage> {
 
   _decrementCounter() {
     setState(() {
-      currentMls <= 0 ? currentMls = 0 : currentMls -= valueByTap;
+      currentMls <= 0.1 ? currentMls = 0 : currentMls -= valueByTap;
     });
 
     final currentDate = dateFormat.format(DateTime.now());
@@ -186,6 +187,19 @@ class _DrinkPageState extends State<DrinkPage> {
                           style: DefaultButtonStyle.secondary,
                           child: const Icon(Icons.remove),
                         ),
+                      ],
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 16),
+                        GlassButton(_incrementCounter, GlassButtonSize.big),
+                        const SizedBox(height: 16),
+                        GlassButton(_incrementCounter, GlassButtonSize.medium),
+                        const SizedBox(height: 16),
+                        GlassButton(_incrementCounter, GlassButtonSize.small),
                       ],
                     )
                   ],
