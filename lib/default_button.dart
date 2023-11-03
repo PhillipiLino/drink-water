@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 enum DefaultButtonStyle {
-  primary(Colors.black, Colors.white),
-  secondary(Color.fromARGB(255, 234, 231, 231), Colors.black);
+  primary(Color.fromRGBO(172, 218, 255, 1), Colors.white),
+  secondary(Color.fromRGBO(227, 242, 253, 1), Colors.blue),
+  tertiary(Color.fromARGB(255, 85, 176, 251), Colors.white);
 
   const DefaultButtonStyle(this.backgroundColor, this.foregroundColor);
   final Color backgroundColor;
@@ -56,7 +57,7 @@ class _DefaultButtonState extends State<DefaultButton> {
             ),
           ),
         ),
-        height: MediaQuery.of(context).size.height * 0.08,
+        height: 50,
         child: AspectRatio(
           aspectRatio: 0.9,
           child: Material(

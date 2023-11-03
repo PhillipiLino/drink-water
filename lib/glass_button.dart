@@ -26,7 +26,7 @@ class GlassButton extends StatelessWidget {
         SizedBox(
           height: 50,
           child: DefaultButton(
-            style: DefaultButtonStyle.secondary,
+            style: DefaultButtonStyle.tertiary,
             onPressed: () => onPressed(glassSize.mls / 1000),
             child: Padding(
               padding: EdgeInsets.all(glassSize.padding),

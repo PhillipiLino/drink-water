@@ -21,12 +21,14 @@ class DrinkPage extends StatefulWidget {
 class _DrinkPageState extends State<DrinkPage> {
   final preferences = SharedPreferencesAdapter();
   final dateFormat = DateFormat('dd/MM/yyyy');
-
   final requiredDrinkKey = 'required_drink';
+  final bottleKey = 'selected_bottle';
+  static const valueByTap = 0.01;
 
   Box<DayDrink>? box;
-  static const valueByTap = 0.05;
   double requiredDrink = 0;
+  int selectedBottleSize = 1;
+  BottleSize currentBottleSize = BottleSize.small;
 
   initiateBox() async {
     final initialize = await Hive.openBox<DayDrink>('dayDrinkBox');
@@ -40,12 +42,17 @@ class _DrinkPageState extends State<DrinkPage> {
     });
   }
 
-  double goal = 2;
+  initiateBottle() async {
+    final bottle = await preferences.getInt(bottleKey);
+    onChangeBottleSize(bottle ?? 1);
+  }
+
   double currentMls = 0;
   int extraBottles = 0;
 
   @override
   void initState() {
+    initiateBottle();
     super.initState();
     initiateBox();
   }
@@ -68,9 +75,29 @@ class _DrinkPageState extends State<DrinkPage> {
     box?.put(currentDate, DayDrink(currentDate, currentMls));
   }
 
+  onChangeBottleSize(dynamic value) {
+    setState(() {
+      selectedBottleSize = value;
+      currentBottleSize = BottleSize.big;
+      if (value == 2) currentBottleSize = BottleSize.medium;
+      if (value == 3) currentBottleSize = BottleSize.small;
+    });
+
+    preferences.setInt(bottleKey, selectedBottleSize);
+  }
+
   @override
   Widget build(BuildContext context) {
-    extraBottles = currentMls ~/ 2;
+    extraBottles = currentMls ~/ currentBottleSize.limit;
+
+    Color textColor = Colors.blue;
+
+    if (currentMls <= 1) textColor = Colors.red;
+
+    if (currentMls > 1 && currentMls < 2) {
+      textColor = const Color.fromARGB(255, 222, 168, 4);
+    }
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -101,10 +128,26 @@ class _DrinkPageState extends State<DrinkPage> {
                               itemCount: extraBottles,
                               separatorBuilder: (_, __) =>
                                   const SizedBox(width: 12),
-                              itemBuilder: (_, __) {
-                                return const Bottle(
-                                  drinkedMls: 2,
-                                  showLimit: false,
+                              itemBuilder: (_, index) {
+                                return Stack(
+                                  children: [
+                                    Bottle(
+                                      drinkedMls: 2,
+                                      bottleSize: currentBottleSize,
+                                    ),
+                                    Positioned.fill(
+                                      child: Center(
+                                        child: Text(
+                                          '${index + 1}',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
                                 );
                               },
                             )
@@ -150,51 +193,81 @@ class _DrinkPageState extends State<DrinkPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.3,
-                      child: Bottle(
-                        drinkedMls: currentMls - ((currentMls ~/ goal) * goal),
-                      ),
-                    ),
-                    const SizedBox(width: 48),
                     Column(
-                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        DefaultButton(
-                          onPressed: _incrementCounter,
-                          child: const Icon(Icons.add),
-                        ),
-                        const SizedBox(height: 16),
-                        Column(
-                          children: [
-                            Text(
-                              currentMls.toLocale(),
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.w500,
-                              ),
+                        DropdownButton(
+                          value: selectedBottleSize,
+                          items: const [
+                            DropdownMenuItem(
+                              value: 1,
+                              child: Text('2 Litros'),
                             ),
-                            const Text(
-                              'Litros',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            DropdownMenuItem(
+                              value: 2,
+                              child: Text('1 Litro'),
+                            ),
+                            DropdownMenuItem(
+                              value: 3,
+                              child: Text('500 ml'),
                             ),
                           ],
+                          onChanged: (value) => onChangeBottleSize(value),
                         ),
-                        const SizedBox(height: 16),
-                        DefaultButton(
-                          onPressed: _decrementCounter,
-                          style: DefaultButtonStyle.secondary,
-                          child: const Icon(Icons.remove),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          child: Bottle(
+                            bottleSize: currentBottleSize,
+                            drinkedMls: currentMls -
+                                ((currentMls ~/ currentBottleSize.limit) *
+                                    currentBottleSize.limit),
+                          ),
                         ),
                       ],
+                    ),
+                    const SizedBox(width: 48),
+                    SizedBox(
+                      width: 60,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DefaultButton(
+                            onPressed: _incrementCounter,
+                            child: const Icon(Icons.add),
+                          ),
+                          const SizedBox(height: 16),
+                          Column(
+                            children: [
+                              Text(
+                                currentMls.toLocale(),
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w500,
+                                  color: textColor,
+                                ),
+                              ),
+                              const Text(
+                                'Litros',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          DefaultButton(
+                            onPressed: _decrementCounter,
+                            style: DefaultButtonStyle.secondary,
+                            child: const Icon(Icons.remove),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(width: 16),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const SizedBox(height: 16),
                         GlassButton(_incrementCounter, GlassButtonSize.big),
                         const SizedBox(height: 16),
                         GlassButton(_incrementCounter, GlassButtonSize.medium),
@@ -203,6 +276,13 @@ class _DrinkPageState extends State<DrinkPage> {
                       ],
                     )
                   ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  'Você precisa beber ${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas dessa para atingir seu consumo mínimo diário de água!',
+                  textAlign: TextAlign.center,
                 ),
               ),
               Align(
