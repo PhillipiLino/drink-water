@@ -8,6 +8,7 @@ import 'bottle.dart';
 import 'day_drink.dart';
 import 'day_drink_chart.dart';
 import 'default_button.dart';
+import 'shared_preferences_adapter.dart';
 
 class DrinkPage extends StatefulWidget {
   const DrinkPage({super.key});
@@ -17,7 +18,11 @@ class DrinkPage extends StatefulWidget {
 }
 
 class _DrinkPageState extends State<DrinkPage> {
+  final preferences = SharedPreferencesAdapter();
   final dateFormat = DateFormat('dd/MM/yyyy');
+
+  final requiredDrinkKey = 'required_drink';
+
   Box<DayDrink>? box;
   final valueByTap = 0.05;
   double requiredDrink = 0;
@@ -25,10 +30,12 @@ class _DrinkPageState extends State<DrinkPage> {
   initiateBox() async {
     final initialize = await Hive.openBox<DayDrink>('dayDrinkBox');
     final getToday = initialize.get(dateFormat.format(DateTime.now()));
+    final drink = await preferences.getDouble(requiredDrinkKey);
 
     setState(() {
       box = initialize;
       currentMls = getToday?.drinkedMls ?? 0;
+      requiredDrink = drink ?? 0;
     });
   }
 
@@ -248,6 +255,7 @@ class _DrinkPageState extends State<DrinkPage> {
                   children: [
                     WaterCalculatorPage((value) {
                       setState(() => requiredDrink = value);
+                      preferences.setDouble(requiredDrinkKey, value);
                     }),
                   ],
                 ),
