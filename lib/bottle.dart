@@ -35,10 +35,12 @@ class Bottle extends StatelessWidget {
               end: Alignment.topCenter,
               colors: const [
                 Color.fromARGB(255, 129, 203, 222),
+                Color.fromARGB(255, 129, 203, 222),
                 Colors.white,
               ],
               stops: [
                 0.0,
+                (drinkedMls / bottleSize.limit) - 0.1,
                 (drinkedMls / bottleSize.limit),
               ],
               tileMode: TileMode.mirror,

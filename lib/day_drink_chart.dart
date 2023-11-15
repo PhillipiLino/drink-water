@@ -1,33 +1,39 @@
-import 'dart:math';
-
 import 'package:drink_water/day_drink.dart';
 import 'package:drink_water/number_extensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:my_components/my_components.dart';
 
 class DayDrinkChart extends StatelessWidget {
   final List<DayDrink> list;
-  const DayDrinkChart(this.list, {super.key});
+  final double goal;
+  const DayDrinkChart(this.list, this.goal, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        width: 1.5 * 25 * list.length,
-        child: BarChart(
-          BarChartData(
-            barTouchData: barTouchData,
-            titlesData: titlesData,
-            borderData: borderData,
-            barGroups: barGroups,
-            gridData: const FlGridData(show: false),
-            alignment: BarChartAlignment.spaceBetween,
-            maxY: list.map((e) => e.drinkedMls).reduce(max) + 1.8,
-          ),
-        ),
-      ),
+    final colors = ThemeManager.shared.theme.colors;
+    const maxSize = 6;
+    final items =
+        list.map((e) => MyChartData(e.date, (e.drinkedMls / maxSize))).toList();
+
+    final goalToSet = goal / maxSize;
+
+    return MyBarChart(
+      goal: goalToSet,
+      items: items,
+      yLabelBuilder: (index) {
+        final itemValue = list[index].drinkedMls;
+        Color textColor = colors.feedbackColors.success.dark;
+
+        if (itemValue <= 1) textColor = colors.feedbackColors.attention.dark;
+        if (itemValue > 1 && itemValue < 2) textColor = colors.energy;
+        if (itemValue >= 2 && itemValue < goal) textColor = colors.primary;
+
+        return Text(
+          '${list[index].drinkedMls.toStringAsFixed(2)} L',
+          style: MyTextStyle.regular(color: textColor),
+        );
+      },
     );
   }
 

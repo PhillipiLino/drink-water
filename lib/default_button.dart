@@ -1,26 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-
-enum DefaultButtonStyle {
-  primary(Color.fromRGBO(172, 218, 255, 1), Colors.white),
-  secondary(Color.fromRGBO(227, 242, 253, 1), Colors.blue),
-  tertiary(Color.fromARGB(255, 85, 176, 251), Colors.white);
-
-  const DefaultButtonStyle(this.backgroundColor, this.foregroundColor);
-  final Color backgroundColor;
-  final Color foregroundColor;
-}
+import 'package:my_components/my_components.dart';
 
 class DefaultButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Widget child;
-  final DefaultButtonStyle style;
+  final MyButtonType type;
 
   const DefaultButton({
     required this.onPressed,
     required this.child,
-    this.style = DefaultButtonStyle.primary,
+    this.type = MyButtonType.primary,
     super.key,
   });
 
@@ -44,34 +35,13 @@ class _DefaultButtonState extends State<DefaultButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: ThemeData(
-        iconTheme: IconThemeData(color: widget.style.foregroundColor),
-      ),
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: const ShapeDecoration(
-          shape: ContinuousRectangleBorder(
-            borderRadius: BorderRadius.all(
-              Radius.circular(20),
-            ),
-          ),
-        ),
-        height: 50,
-        child: AspectRatio(
-          aspectRatio: 0.9,
-          child: Material(
-            color: widget.style.backgroundColor,
-            child: InkWell(
-              onTapDown: (_) => timerAction(widget.onPressed),
-              onTapUp: (_) => cancelTimer(),
-              onTapCancel: cancelTimer,
-              onTap: widget.onPressed,
-              child: widget.child,
-            ),
-          ),
-        ),
-      ),
+    return MyButton(
+      icon: widget.child,
+      type: widget.type,
+      onTapDown: () => timerAction(widget.onPressed),
+      onTapUp: () => cancelTimer(),
+      onTapCancel: cancelTimer,
+      onPressed: widget.onPressed,
     );
   }
 }

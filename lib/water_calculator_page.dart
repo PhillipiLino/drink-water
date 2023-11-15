@@ -1,5 +1,6 @@
 import 'package:drink_water/number_extensions.dart';
 import 'package:flutter/material.dart';
+import 'package:my_components/my_components.dart';
 
 class WaterCalculatorPage extends StatefulWidget {
   final Function(double) onCalculate;
@@ -19,29 +20,29 @@ class _WaterCalculatorPageState extends State<WaterCalculatorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = ThemeManager.shared.theme;
+    final spacings = theme.spacings;
     return Material(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(theme.borderRadius.regular),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(spacings.medium),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              const Text(
+              Text(
                 'Quantos litros de água preciso beber?',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: MyTextStyle.h5(),
+                textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Escreva abaixo o seu peso e mostraremos o quanto de água você deve ingerir',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.w200,
-                  fontSize: 12,
-                ),
+                style: MyTextStyle.light(),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -63,8 +64,8 @@ class _WaterCalculatorPageState extends State<WaterCalculatorPage> {
                 ),
               ),
               const SizedBox(height: 32),
-              ElevatedButton(
-                child: const Text('Calcular'),
+              MyButton(
+                title: 'Calcular',
                 onPressed: () {
                   final text = _weightController.text.replaceAll(',', '.');
                   final currentWeight = double.tryParse(text) ?? 0;

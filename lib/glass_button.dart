@@ -1,11 +1,11 @@
+import 'package:drink_water/default_button.dart';
 import 'package:flutter/material.dart';
-
-import 'default_button.dart';
+import 'package:my_components/my_components.dart';
 
 enum GlassButtonSize {
-  small('assets/images/copo-americano.png', 12.0, 190),
-  medium('assets/images/copo-medio.png', 8.0, 250),
-  big('assets/images/copo-grande.png', 4.0, 350);
+  small('assets/images/copo-americano.png', 3.0, 190),
+  medium('assets/images/copo-medio.png', 1.0, 250),
+  big('assets/images/copo-grande.png', 1.0, 350);
 
   const GlassButtonSize(this.image, this.padding, this.mls);
   final String image;
@@ -26,7 +26,7 @@ class GlassButton extends StatelessWidget {
         SizedBox(
           height: 50,
           child: DefaultButton(
-            style: DefaultButtonStyle.tertiary,
+            type: MyButtonType.secondary,
             onPressed: () => onPressed(glassSize.mls / 1000),
             child: Padding(
               padding: EdgeInsets.all(glassSize.padding),

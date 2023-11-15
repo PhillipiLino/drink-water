@@ -1,14 +1,16 @@
+import 'package:drink_water/default_button.dart';
 import 'package:drink_water/glass_button.dart';
 import 'package:drink_water/number_extensions.dart';
 import 'package:drink_water/water_calculator_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:my_components/my_components.dart';
 
 import 'bottle.dart';
 import 'day_drink.dart';
 import 'day_drink_chart.dart';
-import 'default_button.dart';
 import 'shared_preferences_adapter.dart';
 
 class DrinkPage extends StatefulWidget {
@@ -20,6 +22,7 @@ class DrinkPage extends StatefulWidget {
 
 class _DrinkPageState extends State<DrinkPage> {
   final preferences = SharedPreferencesAdapter();
+  late final DateFormat topDateFormat;
   final dateFormat = DateFormat('dd/MM/yyyy');
   final requiredDrinkKey = 'required_drink';
   final bottleKey = 'selected_bottle';
@@ -52,6 +55,8 @@ class _DrinkPageState extends State<DrinkPage> {
 
   @override
   void initState() {
+    initializeDateFormatting('pt');
+    topDateFormat = DateFormat("dd 'de' MMMM 'de' yyyy", 'pt');
     initiateBottle();
     super.initState();
     initiateBox();
@@ -88,15 +93,14 @@ class _DrinkPageState extends State<DrinkPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = ThemeManager.shared.theme.colors;
     extraBottles = currentMls ~/ currentBottleSize.limit;
 
-    Color textColor = Colors.blue;
+    Color textColor = colors.feedbackColors.success.dark;
 
-    if (currentMls <= 1) textColor = Colors.red;
+    if (currentMls <= 1) textColor = colors.feedbackColors.attention.dark;
 
-    if (currentMls > 1 && currentMls < 2) {
-      textColor = const Color.fromARGB(255, 222, 168, 4);
-    }
+    if (currentMls > 1 && currentMls < 2) textColor = colors.energy;
 
     return Scaffold(
       body: SafeArea(
@@ -108,61 +112,18 @@ class _DrinkPageState extends State<DrinkPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Garrafas Bebidas',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24,
-                      ),
+                    Text(
+                      topDateFormat.format(DateTime.now()),
+                      style: MyTextStyle.h5(),
                     ),
                     const SizedBox(height: 8),
-                    SizedBox(
-                      height: 80,
-                      child: extraBottles > 0
-                          ? ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              itemCount: extraBottles,
-                              separatorBuilder: (_, __) =>
-                                  const SizedBox(width: 12),
-                              itemBuilder: (_, index) {
-                                return Stack(
-                                  children: [
-                                    Bottle(
-                                      drinkedMls: 2,
-                                      bottleSize: currentBottleSize,
-                                    ),
-                                    Positioned.fill(
-                                      child: Center(
-                                        child: Text(
-                                          '${index + 1}',
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                );
-                              },
-                            )
-                          : const Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: Text(
-                                'Você ainda não bebeu nenhuma garrafa completa hoje',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w200,
-                                  fontSize: 16,
-                                ),
-                              ),
-                            ),
+                    Text(
+                      '$extraBottles garrafas bebidas',
+                      style: MyTextStyle.light(),
                     ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
@@ -174,16 +135,11 @@ class _DrinkPageState extends State<DrinkPage> {
                 textAlign: TextAlign.center,
                 text: TextSpan(
                   text: 'Seu consumo de água necessário é de:\n',
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                  ),
+                  style: MyTextStyle.small(color: colors.textColors.primary),
                   children: [
                     TextSpan(
                       text: '${requiredDrink.toLocale()}L',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: MyTextStyle.bold(),
                     ),
                     const TextSpan(text: ' por dia'),
                   ],
@@ -248,11 +204,10 @@ class _DrinkPageState extends State<DrinkPage> {
                                   color: textColor,
                                 ),
                               ),
-                              const Text(
+                              Text(
                                 'Litros',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
+                                style: MyTextStyle.tiny(
+                                  color: colors.textColors.secondary,
                                 ),
                               ),
                             ],
@@ -260,7 +215,7 @@ class _DrinkPageState extends State<DrinkPage> {
                           const SizedBox(height: 16),
                           DefaultButton(
                             onPressed: _decrementCounter,
-                            style: DefaultButtonStyle.secondary,
+                            type: MyButtonType.secondary,
                             child: const Icon(Icons.remove),
                           ),
                         ],
@@ -287,21 +242,17 @@ class _DrinkPageState extends State<DrinkPage> {
                   textAlign: TextAlign.center,
                   text: TextSpan(
                     text: 'Você precisa beber ',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w300,
-                    ),
+                    style: MyTextStyle.small(color: colors.textColors.primary),
                     children: [
                       TextSpan(
                         text:
                             '${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: MyTextStyle.bold(),
                       ),
                       const TextSpan(
-                          text:
-                              ' dessa para atingir seu consumo mínimo diário de água!'),
+                        text:
+                            ' dessa para atingir seu consumo mínimo diário de água!',
+                      ),
                     ],
                   ),
                 ),
@@ -312,21 +263,14 @@ class _DrinkPageState extends State<DrinkPage> {
                   padding: const EdgeInsets.only(
                     left: 32,
                   ),
-                  child: const Column(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Água',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24,
-                        ),
-                      ),
+                      Text('Água', style: MyTextStyle.h4()),
                       Text(
                         'histórico diário',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w200,
-                          fontSize: 20,
+                        style: MyTextStyle.light(
+                          color: colors.textColors.secondary,
                         ),
                       ),
                     ],
@@ -341,7 +285,8 @@ class _DrinkPageState extends State<DrinkPage> {
                   width: double.maxFinite,
                   child: ((box?.length ?? 0) > 0)
                       ? SizedBox(
-                          child: DayDrinkChart(box?.values.toList() ?? []),
+                          child: DayDrinkChart(
+                              box?.values.toList() ?? [], requiredDrink),
                         )
                       : const Center(
                           child: Text('Sem dados salvos até o momento'),
@@ -353,10 +298,10 @@ class _DrinkPageState extends State<DrinkPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue[100],
-        foregroundColor: Colors.blue,
+        foregroundColor: colors.white,
+        backgroundColor: colors.primary,
         mini: true,
-        child: const Icon(Icons.calculate_rounded),
+        child: const HeroIcon(HeroIcons.calculator),
         onPressed: () {
           showDialog(
             context: context,
