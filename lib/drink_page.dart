@@ -147,246 +147,288 @@ class _DrinkPageState extends State<DrinkPage> {
     if (currentMls > 1 && currentMls < 2) textColor = colors.energy;
 
     return Scaffold(
+      backgroundColor: colors.secondary,
       body: SafeArea(
+        bottom: false,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: const BoxDecoration(
+
+                    // borderRadius: BorderRadius.circular(12),
+                    ),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(topDate, style: MyTextStyle.h5()),
-                    const SizedBox(height: 8),
-                    Text(
-                      '$extraBottles garrafas bebidas',
-                      style: MyTextStyle.light(),
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 32.0),
-                child: Divider(),
-              ),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  text: 'Seu consumo de água necessário é de:\n',
-                  style: MyTextStyle.small(color: colors.textColors.primary),
-                  children: [
-                    TextSpan(
-                      text: '${requiredDrink.toLocale()}L',
-                      style: MyTextStyle.bold(),
-                    ),
-                    const TextSpan(text: ' por dia'),
-                  ],
-                ),
-              ),
-              TextButton(
-                child: Text(
-                  'Recalcular',
-                  style: MyTextStyle.light().underlined(
-                    color: colors.primary,
-                    distance: 2,
-                  ),
-                ),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            WaterCalculatorPage((value) {
-                              setState(() => requiredDrink = value);
-                              preferences.setDouble(requiredDrinkKey, value);
-                            }),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-              Expanded(
-                flex: 2,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Column(
-                      children: [
-                        DropdownButton(
-                          value: selectedBottleSize,
-                          items: const [
-                            DropdownMenuItem(
-                              value: 1,
-                              child: Text('2 Litros'),
-                            ),
-                            DropdownMenuItem(
-                              value: 2,
-                              child: Text('1 Litro'),
-                            ),
-                            DropdownMenuItem(
-                              value: 3,
-                              child: Text('500 ml'),
-                            ),
-                          ],
-                          onChanged: (value) => onChangeBottleSize(value),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.3,
-                          child: Bottle(
-                            bottleSize: currentBottleSize,
-                            drinkedMls: currentMls -
-                                ((currentMls ~/ currentBottleSize.limit) *
-                                    currentBottleSize.limit),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 48),
-                    SizedBox(
-                      width: 60,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          DefaultButton(
-                            onPressed: _incrementCounter,
-                            child: const Icon(Icons.add),
+                          Text(
+                            topDate,
+                            style: MyTextStyle.h5(
+                              color: colors.white,
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          Column(
-                            children: [
-                              Text(
-                                currentMls.toLocale(),
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w500,
-                                  color: textColor,
-                                ),
-                              ),
-                              Text(
-                                'Litros',
-                                style: MyTextStyle.tiny(
-                                  color: colors.textColors.secondary,
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 8),
+                          Text(
+                            '$extraBottles garrafas bebidas',
+                            style: MyTextStyle.light(
+                              color: colors.white,
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          DefaultButton(
-                            onPressed: _decrementCounter,
-                            type: MyButtonType.secondary,
-                            child: const Icon(Icons.remove),
-                          ),
+                          const SizedBox(height: 8),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        GlassButton(_incrementCounter, GlassButtonSize.big),
-                        const SizedBox(height: 16),
-                        GlassButton(_incrementCounter, GlassButtonSize.medium),
-                        const SizedBox(height: 16),
-                        GlassButton(_incrementCounter, GlassButtonSize.small),
-                      ],
-                    ),
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: RichText(
-                  textAlign: TextAlign.center,
-                  text: TextSpan(
-                    text: 'Você precisa beber ',
-                    style: MyTextStyle.small(color: colors.textColors.primary),
-                    children: [
-                      TextSpan(
-                        text:
-                            '${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas',
-                        style: MyTextStyle.bold(),
-                      ),
-                      const TextSpan(
-                        text:
-                            ' dessa para atingir seu consumo mínimo diário de água!',
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Histórico diário',
-                        style: MyTextStyle.h4().copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
               Expanded(
-                flex: 1,
                 child: Container(
-                  margin: const EdgeInsets.only(left: 12, right: 12),
-                  width: double.maxFinite,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).scaffoldBackgroundColor,
-                      border: Border.all(
-                        color: colors.primary,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors.feedbackColors.informative.light
-                              .withOpacity(
-                            0.6,
+                  padding: const EdgeInsets.all(12).copyWith(top: 20),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(24),
+                    ),
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      children: [
+                        RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: 'Seu consumo de água necessário é de:\n',
+                            style: MyTextStyle.small(
+                              color: colors.textColors.primary,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: '${requiredDrink.toLocale()}L',
+                                style: MyTextStyle.bold(),
+                              ),
+                              const TextSpan(text: ' por dia'),
+                            ],
                           ),
-                          spreadRadius: 2,
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+                        ),
+                        TextButton(
+                          child: Text(
+                            'Recalcular',
+                            style: MyTextStyle.light().underlined(
+                              color: colors.secondary,
+                              distance: 2,
+                            ),
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      WaterCalculatorPage((value) {
+                                        setState(() => requiredDrink = value);
+                                        preferences.setDouble(
+                                          requiredDrinkKey,
+                                          value,
+                                        );
+                                      }),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                        Expanded(
+                          flex: 2,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Column(
+                                children: [
+                                  DropdownButton(
+                                    value: selectedBottleSize,
+                                    items: const [
+                                      DropdownMenuItem(
+                                        value: 1,
+                                        child: Text('2 Litros'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 2,
+                                        child: Text('1 Litro'),
+                                      ),
+                                      DropdownMenuItem(
+                                        value: 3,
+                                        child: Text('500 ml'),
+                                      ),
+                                    ],
+                                    onChanged: (value) =>
+                                        onChangeBottleSize(value),
+                                  ),
+                                  SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.3,
+                                    child: Bottle(
+                                      bottleSize: currentBottleSize,
+                                      drinkedMls: currentMls -
+                                          ((currentMls ~/
+                                                  currentBottleSize.limit) *
+                                              currentBottleSize.limit),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(width: 48),
+                              SizedBox(
+                                width: 60,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    DefaultButton(
+                                      onPressed: _incrementCounter,
+                                      child: const Icon(Icons.add),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Column(
+                                      children: [
+                                        Text(
+                                          currentMls.toLocale(),
+                                          style: TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w500,
+                                            color: textColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Litros',
+                                          style: MyTextStyle.tiny(
+                                            color: colors.textColors.secondary,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    DefaultButton(
+                                      onPressed: _decrementCounter,
+                                      type: MyButtonType.secondary,
+                                      child: const Icon(Icons.remove),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  GlassButton(
+                                    _incrementCounter,
+                                    GlassButtonSize.big,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  GlassButton(
+                                    _incrementCounter,
+                                    GlassButtonSize.medium,
+                                  ),
+                                  const SizedBox(height: 16),
+                                  GlassButton(
+                                    _incrementCounter,
+                                    GlassButtonSize.small,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              text: 'Você precisa beber ',
+                              style: MyTextStyle.small(
+                                color: colors.textColors.primary,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text:
+                                      '${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas',
+                                  style: MyTextStyle.bold(),
+                                ),
+                                const TextSpan(
+                                  text:
+                                      ' dessa para atingir seu consumo mínimo diário de água!',
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Histórico diário',
+                                  style: MyTextStyle.h4().copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            margin: const EdgeInsets.only(left: 12, right: 12),
+                            width: double.maxFinite,
+                            child: Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: colors.elementsColors.lineAndBorders,
+                                  width: 1,
+                                ),
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: const [],
+                              ),
+                              child: DayDrinkChart(
+                                box?.values.toList() ?? [],
+                                requiredDrink,
+                                selectedDate,
+                                scrollController: chartScrollController,
+                                onTapBar: (index, data) {
+                                  setState(() {
+                                    selectedDate = data.xValue;
+                                    selectedIndex = index;
+                                  });
+
+                                  setDateInfo(selectedDate);
+                                },
+                              ),
+                            ),
+                          ),
                         ),
                       ],
-                    ),
-                    child: DayDrinkChart(
-                      box?.values.toList() ?? [],
-                      requiredDrink,
-                      selectedDate,
-                      scrollController: chartScrollController,
-                      onTapBar: (index, data) {
-                        setState(() {
-                          selectedDate = data.xValue;
-                          selectedIndex = index;
-                        });
-
-                        setDateInfo(selectedDate);
-                      },
                     ),
                   ),
                 ),
