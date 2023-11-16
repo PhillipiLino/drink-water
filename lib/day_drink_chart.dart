@@ -1,22 +1,63 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_components/my_components.dart';
 
 import 'day_drink.dart';
-import 'number_extensions.dart';
 
 class DayDrinkChart extends StatelessWidget {
   final List<DayDrink> list;
   final double goal;
-  const DayDrinkChart(this.list, this.goal, {super.key});
+  final String currentDate;
+  final Function(int index, MyChartData data)? onTapBar;
+  final ScrollController scrollController;
+
+  DayDrinkChart(
+    this.list,
+    this.goal,
+    this.currentDate, {
+    this.onTapBar,
+    required this.scrollController,
+    super.key,
+  });
+
+  final dateFormtat = DateFormat('dd/MM/yyyy');
+
+  List<DateTime> getDaysInBetween(DateTime startDate, DateTime endDate) {
+    List<DateTime> days = [];
+    for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+      days.add(startDate.add(Duration(days: i)));
+    }
+    return days;
+  }
 
   @override
   Widget build(BuildContext context) {
     final colors = ThemeManager.shared.theme.colors;
     const maxSize = 6;
-    final items = list
+
+    if (list.isEmpty) {
+      return const Center(
+        child: Text('Sem dados salvos até o momento'),
+      );
+    }
+
+    final firstDate = dateFormtat.parse(list.first.date);
+    final lastDate = dateFormtat.parse(list.last.date);
+    final dateList = getDaysInBetween(firstDate, lastDate)
+        .map((e) => dateFormtat.format(e))
+        .toList();
+
+    var result = {for (var v in list) v.date: v.drinkedMls};
+
+    List<DayDrink> newList = [];
+    for (var date in dateList) {
+      final value = result[date] ?? 0;
+      newList.add(DayDrink(date, value));
+    }
+
+    final items = newList
         .map(
-          (e) => MyChartData(e.date.substring(0, 5), (e.drinkedMls / maxSize)),
+          (e) => MyChartData(e.date, (e.drinkedMls / maxSize)),
         )
         .toList();
 
@@ -25,8 +66,14 @@ class DayDrinkChart extends StatelessWidget {
     return MyBarChart(
       goal: goalToSet,
       items: items,
+      selectedXValue: currentDate,
+      scrollController: scrollController,
+      onTapBar: (index, data) {
+        onTapBar?.call(index, data);
+      },
       yLabelBuilder: (index) {
-        final itemValue = list[index].drinkedMls;
+        final itemValue = newList[index].drinkedMls;
+
         Color textColor = colors.feedbackColors.success.dark;
 
         if (itemValue <= 1) textColor = colors.feedbackColors.attention.dark;
@@ -34,124 +81,18 @@ class DayDrinkChart extends StatelessWidget {
         if (itemValue >= 2 && itemValue < goal) textColor = colors.primary;
 
         return Text(
-          '${list[index].drinkedMls.toStringAsFixed(2)} L',
+          '${newList[index].drinkedMls.toStringAsFixed(2)} L',
           style: MyTextStyle.regular(color: textColor),
+        );
+      },
+      xLabelBuilder: (index) {
+        final itemValue = items[index].xValue.substring(0, 5);
+
+        return Text(
+          itemValue,
+          style: MyTextStyle.regular(),
         );
       },
     );
   }
-
-  BarTouchData get barTouchData => BarTouchData(
-        enabled: false,
-        touchTooltipData: BarTouchTooltipData(
-          tooltipBgColor: Colors.transparent,
-          tooltipPadding: EdgeInsets.zero,
-          tooltipMargin: 8,
-          getTooltipItem: (
-            BarChartGroupData group,
-            int groupIndex,
-            BarChartRodData rod,
-            int rodIndex,
-          ) {
-            Color textColor = Colors.blue;
-
-            if (rod.toY <= 1) textColor = Colors.red;
-
-            if (rod.toY > 1 && rod.toY < 2) {
-              textColor = const Color.fromARGB(255, 222, 168, 4);
-            }
-
-            return BarTooltipItem(
-              '${rod.toY.toLocale()} L',
-              TextStyle(
-                color: textColor,
-                fontWeight: FontWeight.bold,
-              ),
-            );
-          },
-        ),
-      );
-
-  Widget getTitles(double value, TitleMeta meta) {
-    const style = TextStyle(
-      color: Colors.black,
-      fontWeight: FontWeight.w300,
-      fontSize: 14,
-    );
-    String text;
-    text = list[value.toInt()].date.substring(0, 5);
-
-    return SideTitleWidget(
-      axisSide: meta.axisSide,
-      space: 4,
-      child: Text(text, style: style),
-    );
-  }
-
-  FlTitlesData get titlesData => FlTitlesData(
-        show: true,
-        bottomTitles: AxisTitles(
-          sideTitles: SideTitles(
-            showTitles: true,
-            reservedSize: 30,
-            getTitlesWidget: getTitles,
-          ),
-        ),
-        leftTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        topTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-        rightTitles: const AxisTitles(
-          sideTitles: SideTitles(showTitles: false),
-        ),
-      );
-
-  FlBorderData get borderData => FlBorderData(show: false);
-
-  LinearGradient _barsGradient(double value) {
-    Color topColor = Colors.cyan;
-    Color bottomColor = Colors.blue;
-
-    if (value <= 1) {
-      topColor = const Color.fromARGB(255, 255, 175, 187);
-      bottomColor = Colors.red;
-    }
-
-    if (value > 1 && value < 2) {
-      topColor = const Color.fromARGB(255, 253, 220, 119);
-      bottomColor = Colors.amber;
-    }
-
-    return LinearGradient(
-      colors: [
-        bottomColor,
-        topColor,
-      ],
-      begin: Alignment.bottomCenter,
-      end: Alignment.topCenter,
-    );
-  }
-
-  List<BarChartGroupData> get barGroups => list
-      .asMap()
-      .map(
-        (key, value) => MapEntry(
-          key,
-          BarChartGroupData(
-            x: key,
-            barRods: [
-              BarChartRodData(
-                toY: value.drinkedMls,
-                gradient: _barsGradient(value.drinkedMls),
-                width: 10,
-              ),
-            ],
-            showingTooltipIndicators: [0],
-          ),
-        ),
-      )
-      .values
-      .toList();
 }

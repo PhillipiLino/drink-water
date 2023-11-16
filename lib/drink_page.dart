@@ -22,6 +22,13 @@ class DrinkPage extends StatefulWidget {
 
 class _DrinkPageState extends State<DrinkPage> {
   final preferences = SharedPreferencesAdapter();
+  late final chartScrollController = ScrollController(
+    onAttach: (position) async {
+      await Future.delayed(const Duration(milliseconds: 300));
+      scrollChartToIndex(position.maxScrollExtent);
+    },
+  );
+
   late final DateFormat topDateFormat;
   final dateFormat = DateFormat('dd/MM/yyyy');
   final requiredDrinkKey = 'required_drink';
@@ -32,17 +39,52 @@ class _DrinkPageState extends State<DrinkPage> {
   double requiredDrink = 0;
   int selectedBottleSize = 1;
   BottleSize currentBottleSize = BottleSize.small;
+  late String selectedDate = dateFormat.format(DateTime.now());
+  late int selectedIndex = 0;
+  late String topDate;
 
   initiateBox() async {
-    final initialize = await Hive.openBox<DayDrink>('dayDrinkBox');
-    final getToday = initialize.get(dateFormat.format(DateTime.now()));
+    box = await Hive.openBox<DayDrink>('dayDrinkBox');
+    setDateInfo(selectedDate, false);
+  }
+
+  setDateInfo(String date, [bool scroll = true]) async {
+    final getToday = box?.get(date);
     final drink = await preferences.getDouble(requiredDrinkKey);
+    final topDateTime = dateFormat.parse(date);
+    topDate = topDateFormat.format(topDateTime);
 
     setState(() {
-      box = initialize;
       currentMls = getToday?.drinkedMls ?? 0;
       requiredDrink = drink ?? 0;
     });
+
+    if (!scroll) return;
+    scrollChartToIndex();
+  }
+
+  scrollChartToIndex([double? forceOffset]) {
+    if ((box?.length ?? 0) <= 0) return;
+    final scrollEnd = chartScrollController.position.maxScrollExtent;
+    if (forceOffset != null) {
+      chartScrollController.jumpTo(forceOffset);
+      return;
+    }
+
+    final currentOffset = chartScrollController.offset;
+    final newOffset = selectedIndex * 35;
+    final offsetGreaterThanFinal = newOffset > scrollEnd;
+    final offsetToUse = offsetGreaterThanFinal ? scrollEnd : newOffset;
+
+    if (offsetToUse >= currentOffset - 2 && offsetToUse <= -currentOffset + 2) {
+      return;
+    }
+
+    chartScrollController.animateTo(
+      offsetToUse.toDouble(),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   initiateBottle() async {
@@ -57,6 +99,8 @@ class _DrinkPageState extends State<DrinkPage> {
   void initState() {
     initializeDateFormatting('pt');
     topDateFormat = DateFormat("dd 'de' MMMM 'de' yyyy", 'pt');
+    topDate = topDateFormat.format(DateTime.now());
+
     initiateBottle();
     super.initState();
     initiateBox();
@@ -67,8 +111,8 @@ class _DrinkPageState extends State<DrinkPage> {
       currentMls + value >= 6 ? currentMls = 6 : currentMls += value;
     });
 
-    final currentDate = dateFormat.format(DateTime.now());
-    box?.put(currentDate, DayDrink(currentDate, currentMls));
+    box?.put(selectedDate, DayDrink(selectedDate, currentMls));
+    scrollChartToIndex();
   }
 
   _decrementCounter() {
@@ -76,8 +120,8 @@ class _DrinkPageState extends State<DrinkPage> {
       currentMls <= 0.1 ? currentMls = 0 : currentMls -= valueByTap;
     });
 
-    final currentDate = dateFormat.format(DateTime.now());
-    box?.put(currentDate, DayDrink(currentDate, currentMls));
+    box?.put(selectedDate, DayDrink(selectedDate, currentMls));
+    scrollChartToIndex();
   }
 
   onChangeBottleSize(dynamic value) {
@@ -114,10 +158,7 @@ class _DrinkPageState extends State<DrinkPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      topDateFormat.format(DateTime.now()),
-                      style: MyTextStyle.h5(),
-                    ),
+                    Text(topDate, style: MyTextStyle.h5()),
                     const SizedBox(height: 8),
                     Text(
                       '$extraBottles garrafas bebidas',
@@ -290,17 +331,16 @@ class _DrinkPageState extends State<DrinkPage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Container(
-                  padding: const EdgeInsets.only(
-                    left: 32,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Água', style: MyTextStyle.h4()),
                       Text(
-                        'histórico diário',
-                        style: MyTextStyle.light(
-                          color: colors.textColors.secondary,
+                        'Histórico diário',
+                        style: MyTextStyle.h4().copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -311,18 +351,44 @@ class _DrinkPageState extends State<DrinkPage> {
               Expanded(
                 flex: 1,
                 child: Container(
-                  margin: const EdgeInsets.only(left: 32, right: 12),
+                  margin: const EdgeInsets.only(left: 12, right: 12),
                   width: double.maxFinite,
-                  child: ((box?.length ?? 0) > 0)
-                      ? SizedBox(
-                          child: DayDrinkChart(
-                            box?.values.toList() ?? [],
-                            requiredDrink,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      border: Border.all(
+                        color: colors.primary,
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colors.feedbackColors.informative.light
+                              .withOpacity(
+                            0.6,
                           ),
-                        )
-                      : const Center(
-                          child: Text('Sem dados salvos até o momento'),
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
                         ),
+                      ],
+                    ),
+                    child: DayDrinkChart(
+                      box?.values.toList() ?? [],
+                      requiredDrink,
+                      selectedDate,
+                      scrollController: chartScrollController,
+                      onTapBar: (index, data) {
+                        setState(() {
+                          selectedDate = data.xValue;
+                          selectedIndex = index;
+                        });
+
+                        setDateInfo(selectedDate);
+                      },
+                    ),
+                  ),
                 ),
               ),
             ],
