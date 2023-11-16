@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:my_components/my_components.dart';
 
-import 'day_drink.dart';
-import 'drink_page.dart';
+import 'domain/models/day_drink.dart';
+import 'presenter/pages/drink_page.dart';
 
 void main() async {
   ThemeManager.shared.initializeTheme();

@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 
-enum BottleSize {
-  small(
-    'assets/images/small_bottle_mask.png',
-    'assets/images/small_bottle_overlay.png',
-    0.25,
-  ),
-  medium(
-    'assets/images/medium_bottle_mask.png',
-    'assets/images/medium_bottle_overlay.png',
-    1,
-  ),
-  big('assets/images/bottle_mask.png', 'assets/images/bottle_overlay.png', 2);
+import '../../utils/images.dart';
 
-  const BottleSize(this.imageMask, this.imageOverlay, this.limit);
-  final String imageMask;
-  final String imageOverlay;
+enum BottleSize {
+  small(Images.smallBottleMask, Images.smallBottleOverlay, 0.5, '500 ml'),
+  medium(Images.mediumBottleMask, Images.mediumBottleOverlay, 1, '1 litro'),
+  big(Images.bigBottleMask, Images.bigBottleOverlay, 2, '2 litros');
+
+  const BottleSize(this.imageMask, this.imageOverlay, this.limit, this.label);
+  final AssetImage imageMask;
+  final AssetImage imageOverlay;
   final double limit;
+  final String label;
 }
 
 class Bottle extends StatelessWidget {
@@ -52,9 +47,9 @@ class Bottle extends StatelessWidget {
               tileMode: TileMode.mirror,
             ).createShader(bounds);
           },
-          child: Image.asset(bottleSize.imageMask),
+          child: Image(image: bottleSize.imageMask),
         ),
-        Image.asset(bottleSize.imageOverlay),
+        Image(image: bottleSize.imageOverlay),
       ],
     );
   }

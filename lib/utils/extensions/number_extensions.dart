@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:intl/intl.dart';
+import 'package:my_components/my_components.dart';
 
 extension NumExtensions on num? {
   String toCurrency({
@@ -46,4 +49,16 @@ extension NumExtensions on num? {
   }
 
   String numToString({int pad = 0}) => toString().padLeft(pad, '0');
+
+  Color getDrinkedValueColor(double goal) {
+    final value = this ?? 0;
+    final colors = ThemeManager.shared.theme.colors;
+    Color textColor = colors.feedbackColors.success.dark;
+
+    if (value <= 1) textColor = colors.feedbackColors.attention.dark;
+    if (value > 1 && value < 2) textColor = colors.energy;
+    if (value >= 2 && value < goal) textColor = colors.primary;
+
+    return textColor;
+  }
 }
