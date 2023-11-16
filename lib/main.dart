@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      home: const DrinkPage(),
       scrollBehavior: const MaterialScrollBehavior().copyWith(
         dragDevices: {
           PointerDeviceKind.mouse,
@@ -39,12 +40,13 @@ class MyApp extends StatelessWidget {
         },
       ),
       theme: ThemeData(
+        fontFamily: ThemeManager.shared.theme.fontFamilies.base,
+        package: ThemeManager.shared.theme.package,
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: ThemeManager.shared.theme.colors.primary,
         ),
-        useMaterial3: true,
       ),
-      home: const DrinkPage(),
     );
   }
 }

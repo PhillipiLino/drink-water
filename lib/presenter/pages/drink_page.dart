@@ -70,16 +70,19 @@ class _DrinkPageState extends State<DrinkPage> {
   }
 
   scrollChartToIndex([double? forceOffset]) {
-    if ((box?.length ?? 0) <= 0) return;
+    final listSize = box?.length ?? 0;
+    if (listSize <= 0) return;
     final scrollEnd = chartScrollController.position.maxScrollExtent;
     if (forceOffset != null) {
       chartScrollController.jumpTo(forceOffset);
       return;
     }
 
+    var widthOfItem = 40 + 12;
+    final isLastItem = selectedIndex == listSize - 1;
     final currentOffset = chartScrollController.offset;
-    final newOffset = selectedIndex * 35;
-    final offsetGreaterThanFinal = newOffset > scrollEnd;
+    final newOffset = selectedIndex * widthOfItem;
+    final offsetGreaterThanFinal = newOffset > scrollEnd || isLastItem;
     final offsetToUse = offsetGreaterThanFinal ? scrollEnd : newOffset;
 
     if (offsetToUse >= currentOffset - 2 && offsetToUse <= -currentOffset + 2) {
@@ -141,6 +144,24 @@ class _DrinkPageState extends State<DrinkPage> {
     preferences.setInt(bottleKey, selectedBottleSize);
   }
 
+  String getDrunkedBottlesCount(num count) {
+    return Intl.plural(
+      count,
+      zero: 'Nenhuma garrafa bebida',
+      one: '1 garrafa bebida',
+      other: '$count garrafas bebidas',
+    );
+  }
+
+  String getBottlesCount(num count) {
+    return Intl.plural(
+      count.ceil(),
+      zero: 'Nenhuma garrafa',
+      one: '1 garrafa',
+      other: '${count.toLocale()} garrafas',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = ThemeManager.shared.theme;
@@ -150,15 +171,16 @@ class _DrinkPageState extends State<DrinkPage> {
     final textColor = currentMls.getDrinkedValueColor(requiredDrink);
     extraBottles = currentMls ~/ currentBottleSize.limit;
 
-    final drinkedBottles = '$extraBottles garrafas bebidas';
+    final drinkedBottles = getDrunkedBottlesCount(extraBottles);
     const requiredDrinkText1 = 'Seu consumo de água necessário é de:\n';
     final requiredDrinkText2 = '${requiredDrink.toLocale()}L';
     const requiredDrinkText3 = ' por dia';
     const recalculateButton = 'Recalcular';
     const liters = 'Litros';
+
+    final requiredBottles = requiredDrink / currentBottleSize.limit;
     const needDrinkText1 = 'Você precisa beber ';
-    final needDrinkText2 =
-        '${(requiredDrink / currentBottleSize.limit).toLocale()} garrafas';
+    final needDrinkText2 = getBottlesCount(requiredBottles);
     const needDrinkText3 =
         ' dessa para atingir seu consumo mínimo diário de água!';
     const historyTitle = 'Histórico diário';
@@ -183,7 +205,10 @@ class _DrinkPageState extends State<DrinkPage> {
                         children: [
                           Text(
                             topDate,
-                            style: MyTextStyle.h5(color: colors.white),
+                            style: MyTextStyle.h5(
+                              color: colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                           SizedBox(height: spacings.xxsmall),
                           Text(
@@ -211,9 +236,9 @@ class _DrinkPageState extends State<DrinkPage> {
                   child: SafeArea(
                     child: Column(
                       children: [
-                        RichText(
+                        Text.rich(
                           textAlign: TextAlign.center,
-                          text: TextSpan(
+                          TextSpan(
                             text: requiredDrinkText1,
                             style: MyTextStyle.small(
                               color: colors.textColors.primary,
@@ -325,9 +350,9 @@ class _DrinkPageState extends State<DrinkPage> {
                         Expanded(
                           flex: 1,
                           child: Center(
-                            child: RichText(
+                            child: Text.rich(
                               textAlign: TextAlign.center,
-                              text: TextSpan(
+                              TextSpan(
                                 text: needDrinkText1,
                                 style: MyTextStyle.small(
                                   color: colors.textColors.primary,

@@ -95,17 +95,24 @@ class DayDrinkChart extends StatelessWidget {
           final itemValue = newList[index].drinkedMls;
           final textColor = itemValue.getDrinkedValueColor(goal);
 
-          return Text(
-            '${newList[index].drinkedMls.toStringAsFixed(2)} L',
-            style: MyTextStyle.regular(color: textColor),
+          return SizedBox(
+            width: 40,
+            child: Text(
+              newList[index].drinkedMls.toStringAsFixed(2),
+              style: MyTextStyle.small(color: textColor),
+              textAlign: TextAlign.center,
+            ),
           );
         },
         xLabelBuilder: (index) {
           final itemValue = items[index].xValue.substring(0, 5);
 
-          return Text(
-            itemValue,
-            style: MyTextStyle.regular(),
+          return SizedBox(
+            width: 35,
+            child: Text(
+              itemValue,
+              style: MyTextStyle.tiny(),
+            ),
           );
         },
       ),
