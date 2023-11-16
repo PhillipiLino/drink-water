@@ -252,7 +252,7 @@ class _DrinkPageState extends State<DrinkPage> {
                           },
                         ),
                         Expanded(
-                          flex: 2,
+                          flex: 5,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
@@ -272,9 +272,7 @@ class _DrinkPageState extends State<DrinkPage> {
                                         )
                                         .toList(),
                                   ),
-                                  SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.3,
+                                  Expanded(
                                     child: Bottle(
                                       bottleSize: currentBottleSize,
                                       drinkedMls: currentMls -
@@ -324,22 +322,27 @@ class _DrinkPageState extends State<DrinkPage> {
                             ],
                           ),
                         ),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            text: needDrinkText1,
-                            style: MyTextStyle.small(
-                              color: colors.textColors.primary,
+                        Expanded(
+                          flex: 1,
+                          child: Center(
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                text: needDrinkText1,
+                                style: MyTextStyle.small(
+                                  color: colors.textColors.primary,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: needDrinkText2,
+                                    style: MyTextStyle.bold(),
+                                  ),
+                                  const TextSpan(
+                                    text: needDrinkText3,
+                                  ),
+                                ],
+                              ),
                             ),
-                            children: [
-                              TextSpan(
-                                text: needDrinkText2,
-                                style: MyTextStyle.bold(),
-                              ),
-                              const TextSpan(
-                                text: needDrinkText3,
-                              ),
-                            ],
                           ),
                         ),
                         SizedBox(height: spacings.xxxsmall),
@@ -364,7 +367,7 @@ class _DrinkPageState extends State<DrinkPage> {
                         ),
                         SizedBox(height: spacings.xxsmall),
                         Expanded(
-                          flex: 1,
+                          flex: 2,
                           child: DayDrinkChart(
                             box?.values.toList() ?? [],
                             requiredDrink,
