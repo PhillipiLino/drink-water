@@ -1,7 +1,3 @@
-import 'package:drink_water/default_button.dart';
-import 'package:drink_water/glass_button.dart';
-import 'package:drink_water/number_extensions.dart';
-import 'package:drink_water/water_calculator_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -11,7 +7,11 @@ import 'package:my_components/my_components.dart';
 import 'bottle.dart';
 import 'day_drink.dart';
 import 'day_drink_chart.dart';
+import 'default_button.dart';
+import 'glass_button.dart';
+import 'number_extensions.dart';
 import 'shared_preferences_adapter.dart';
+import 'water_calculator_page.dart';
 
 class DrinkPage extends StatefulWidget {
   const DrinkPage({super.key});
@@ -145,6 +145,36 @@ class _DrinkPageState extends State<DrinkPage> {
                   ],
                 ),
               ),
+              TextButton(
+                child: Text(
+                  'Recalcular',
+                  style: MyTextStyle.light().underlined(
+                    color: colors.primary,
+                    distance: 2,
+                  ),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            WaterCalculatorPage((value) {
+                              setState(() => requiredDrink = value);
+                              preferences.setDouble(requiredDrinkKey, value);
+                            }),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
               Expanded(
                 flex: 2,
                 child: Row(
@@ -232,7 +262,7 @@ class _DrinkPageState extends State<DrinkPage> {
                         const SizedBox(height: 16),
                         GlassButton(_incrementCounter, GlassButtonSize.small),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -286,7 +316,9 @@ class _DrinkPageState extends State<DrinkPage> {
                   child: ((box?.length ?? 0) > 0)
                       ? SizedBox(
                           child: DayDrinkChart(
-                              box?.values.toList() ?? [], requiredDrink),
+                            box?.values.toList() ?? [],
+                            requiredDrink,
+                          ),
                         )
                       : const Center(
                           child: Text('Sem dados salvos até o momento'),
@@ -296,33 +328,6 @@ class _DrinkPageState extends State<DrinkPage> {
             ],
           ),
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        foregroundColor: colors.white,
-        backgroundColor: colors.primary,
-        mini: true,
-        child: const HeroIcon(HeroIcons.calculator),
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    WaterCalculatorPage((value) {
-                      setState(() => requiredDrink = value);
-                      preferences.setDouble(requiredDrinkKey, value);
-                    }),
-                  ],
-                ),
-              );
-            },
-          );
-        },
       ),
     );
   }

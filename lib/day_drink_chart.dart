@@ -1,8 +1,9 @@
-import 'package:drink_water/day_drink.dart';
-import 'package:drink_water/number_extensions.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:my_components/my_components.dart';
+
+import 'day_drink.dart';
+import 'number_extensions.dart';
 
 class DayDrinkChart extends StatelessWidget {
   final List<DayDrink> list;
@@ -13,8 +14,11 @@ class DayDrinkChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = ThemeManager.shared.theme.colors;
     const maxSize = 6;
-    final items =
-        list.map((e) => MyChartData(e.date, (e.drinkedMls / maxSize))).toList();
+    final items = list
+        .map(
+          (e) => MyChartData(e.date.substring(0, 5), (e.drinkedMls / maxSize)),
+        )
+        .toList();
 
     final goalToSet = goal / maxSize;
 
@@ -142,7 +146,7 @@ class DayDrinkChart extends StatelessWidget {
                 toY: value.drinkedMls,
                 gradient: _barsGradient(value.drinkedMls),
                 width: 10,
-              )
+              ),
             ],
             showingTooltipIndicators: [0],
           ),

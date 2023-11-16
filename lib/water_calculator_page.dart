@@ -1,6 +1,7 @@
-import 'package:drink_water/number_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:my_components/my_components.dart';
+
+import 'number_extensions.dart';
 
 class WaterCalculatorPage extends StatefulWidget {
   final Function(double) onCalculate;

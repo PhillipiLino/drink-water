@@ -1,6 +1,7 @@
-import 'package:drink_water/number_extensions.dart';
-import 'package:drink_water/string_extensions.dart';
 import 'package:flutter/services.dart';
+
+import 'number_extensions.dart';
+import 'string_extensions.dart';
 
 class WeightInputFormatter extends TextInputFormatter {
   final bool allowNegative;

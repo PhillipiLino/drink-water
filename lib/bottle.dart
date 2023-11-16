@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 
 enum BottleSize {
-  small('assets/images/small_bottle_mask.png',
-      'assets/images/small_bottle_overlay.png', 0.25),
-  medium('assets/images/medium_bottle_mask.png',
-      'assets/images/medium_bottle_overlay.png', 1),
+  small(
+    'assets/images/small_bottle_mask.png',
+    'assets/images/small_bottle_overlay.png',
+    0.25,
+  ),
+  medium(
+    'assets/images/medium_bottle_mask.png',
+    'assets/images/medium_bottle_overlay.png',
+    1,
+  ),
   big('assets/images/bottle_mask.png', 'assets/images/bottle_overlay.png', 2);
 
   const BottleSize(this.imageMask, this.imageOverlay, this.limit);
