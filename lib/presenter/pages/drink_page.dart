@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -7,6 +9,7 @@ import 'package:my_components/my_components.dart';
 
 import '../../domain/models/day_drink.dart';
 import '../../utils/extensions/number_extensions.dart';
+import '../../utils/notifications_manager.dart';
 import '../../utils/shared_preferences_adapter.dart';
 import '../widgets/bottle.dart';
 import '../widgets/day_drink_chart.dart';
@@ -47,6 +50,28 @@ class _DrinkPageState extends State<DrinkPage> {
   late String selectedDate = dateFormat.format(DateTime.now());
   late int selectedIndex = 0;
   late String topDate;
+
+  Timer? timerNotification;
+  bool timerIsOn = false;
+
+  turnOnTimer() {
+    timerNotification = Timer.periodic(
+      const Duration(hours: 1),
+      (timer) async {
+        NotificationsManager.shared.showRememberNotification();
+      },
+    );
+  }
+
+  turnOffTimer() {
+    timerNotification?.cancel();
+    timerNotification = null;
+  }
+
+  onPressNotificationCheckbox() {
+    if (timerIsOn) turnOnTimer();
+    if (!timerIsOn) turnOffTimer();
+  }
 
   initiateBox() async {
     box = await Hive.openBox<DayDrink>('dayDrinkBox');
@@ -214,6 +239,29 @@ class _DrinkPageState extends State<DrinkPage> {
                           Text(
                             drinkedBottles,
                             style: MyTextStyle.light(color: colors.white),
+                          ),
+                          SizedBox(height: spacings.xxsmall),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Checkbox(
+                                value: timerIsOn,
+                                onChanged: (newValue) {
+                                  setState(() => timerIsOn = newValue ?? false);
+                                  onPressNotificationCheckbox();
+                                },
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() => timerIsOn = !timerIsOn);
+                                  onPressNotificationCheckbox();
+                                },
+                                child: Text(
+                                  'Notificação',
+                                  style: MyTextStyle.black(color: colors.white),
+                                ),
+                              ),
+                            ],
                           ),
                           SizedBox(height: spacings.xxsmall),
                         ],

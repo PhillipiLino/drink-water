@@ -6,6 +6,7 @@ import 'package:my_components/my_components.dart';
 
 import 'domain/models/day_drink.dart';
 import 'presenter/pages/drink_page.dart';
+import 'utils/notifications_manager.dart';
 
 void main() async {
   ThemeManager.shared.initializeTheme();
@@ -18,6 +19,8 @@ void main() async {
 
   ThemeManager.shared.setThemeByJson(newTheme);
   WidgetsFlutterBinding.ensureInitialized();
+  await NotificationsManager.shared.initializeLocalPushs();
+
   await Hive.initFlutter();
   Hive.registerAdapter(DayDrinkAdapter());
 

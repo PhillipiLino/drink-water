@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   shared_preferences: ^2.2.2
   collection: ^1.18.0
+  flutter_local_notifications: ^16.1.0
   my_components:
     path: ../my_components
 
